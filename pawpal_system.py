@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
+from datetime import datetime, timedelta
 
 
 @dataclass
@@ -11,6 +12,7 @@ class Task:
     time: str  # "HH:MM" format, e.g. "08:00"
     frequency: str = "once"  # "once", "daily", "weekly"
     completed: bool = False
+    pet_name: str = ""  # set automatically when added to a Pet
 
     def mark_complete(self) -> None:
         """Marks this task as completed."""
@@ -26,6 +28,7 @@ class Pet:
 
     def add_task(self, task: Task) -> None:
         """Adds a new task to this pet's task list."""
+        task.pet_name = self.name
         self.tasks.append(task)
 
     def get_tasks(self) -> List[Task]:
@@ -58,17 +61,67 @@ class Scheduler:
         self.owner = owner
 
     def sort_by_time(self) -> List[Task]:
-        """Returns all of the owner's tasks sorted chronologically by time."""
-        pass  # implemented in Phase 4
+        """Returns all of the owner's tasks sorted chronologically by time (HH:MM)."""
+        tasks = self.owner.get_all_tasks()
+        return sorted(tasks, key=lambda t: t.time)
 
     def filter_tasks(self, completed: Optional[bool] = None, pet_name: Optional[str] = None) -> List[Task]:
         """Returns tasks filtered by completion status and/or pet name."""
-        pass  # implemented in Phase 4
+        tasks = self.owner.get_all_tasks()
+
+        if completed is not None:
+            tasks = [t for t in tasks if t.completed == completed]
+
+        if pet_name is not None:
+            tasks = [t for t in tasks if t.pet_name == pet_name]
+
+        return tasks
 
     def detect_conflicts(self) -> List[str]:
         """Returns a list of warning messages for tasks scheduled at the same time."""
-        pass  # implemented in Phase 4
+        warnings = []
+        tasks = self.owner.get_all_tasks()
+
+        # Only consider incomplete tasks — a completed task isn't really "scheduled" anymore
+        active_tasks = [t for t in tasks if not t.completed]
+
+        # Group tasks by their time slot
+        time_map = {}
+        for task in active_tasks:
+            time_map.setdefault(task.time, []).append(task)
+
+        # Any time slot with more than one task is a conflict
+        for time_slot, tasks_at_time in time_map.items():
+            if len(tasks_at_time) > 1:
+                names = ", ".join(f"{t.title} ({t.pet_name})" for t in tasks_at_time)
+                warnings.append(f"⚠️ Conflict at {time_slot}: {names}")
+
+        return warnings
 
     def handle_recurring(self, task: Task) -> Optional[Task]:
         """If a completed task is daily/weekly, creates and returns the next occurrence."""
-        pass  # implemented in Phase 4
+        if not task.completed or task.frequency == "once":
+            return None
+
+        # Calculate the next date offset based on frequency
+        days_ahead = 1 if task.frequency == "daily" else 7
+
+        # NOTE: since we only track time (not full datetime), we just create
+        # a fresh Task instance for the next occurrence with completed reset.
+        next_task = Task(
+            title=task.title,
+            duration_minutes=task.duration_minutes,
+            priority=task.priority,
+            time=task.time,
+            frequency=task.frequency,
+            completed=False,
+            pet_name=task.pet_name,
+        )
+
+        # Find the pet this task belongs to and add the new occurrence
+        for pet in self.owner.pets:
+            if pet.name == task.pet_name:
+                pet.add_task(next_task)
+                break
+
+        return next_task
