@@ -63,28 +63,40 @@ Checking for scheduling conflicts...
 
 ```bash
 # Run the full test suite:
-pytest
-
-# Run with coverage:
-pytest --cov
+python -m pytest
 ```
+
+My test suite covers:
+- Basic task/pet behavior (marking complete, adding tasks)
+- Sorting correctness (chronological order, empty-list edge case)
+- Recurrence logic (daily tasks generate a new occurrence; one-time and incomplete tasks do not)
+- Conflict detection (duplicate times are flagged; completed tasks are correctly excluded from conflicts; no false positives on distinct times)
 
 Sample test output:
 
 ```
-# Paste your pytest output here
+================================================== test session starts ==================================================
+platform win32 -- Python 3.14.5, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\Users\kbayona\ai110-module2show-pawpal-starter
+plugins: anyio-4.13.0
+collected 10 items
+
+tests\test_pawpal.py ..........                                                                                    [100%]
+
+=================================================== 10 passed in 0.09s ===================================================
+```
+
+**Confidence Level:** ⭐⭐⭐⭐☆ (4/5) — All core behaviors and several edge cases are verified. I'd want to test multi-day recurrence chains and larger datasets before rating this 5/5.
 ```
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
-
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | `Scheduler.sort_by_time()` | Sorts all tasks chronologically by their "HH:MM" time string |
+| Filtering | `Scheduler.filter_tasks()` | Filters by completion status and/or pet name |
+| Conflict handling | `Scheduler.detect_conflicts()` | Flags tasks scheduled at the same time; only considers incomplete tasks |
+| Recurring tasks | `Scheduler.handle_recurring()` | Creates a fresh incomplete Task instance for daily/weekly tasks once marked complete |
 
 ## 📸 Demo Walkthrough
 

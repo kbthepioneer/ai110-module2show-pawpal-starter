@@ -44,7 +44,7 @@ def main():
     print("\nHandling recurrence for 'Morning walk'...")
     next_occurrence = scheduler.handle_recurring(sorted_tasks[0])
     if next_occurrence:
-        print(f"  New task created for tomorrow: {next_occurrence.title} at {next_occurrence.time}")
+        print(f"  New task created for next occurrence: {next_occurrence.title} at {next_occurrence.time} (frequency: {next_occurrence.frequency}, completed: {next_occurrence.completed})")
 
     # Demonstrate conflict detection
     print("\nChecking for scheduling conflicts...")
@@ -54,6 +54,16 @@ def main():
             print(f"  {warning}")
     else:
         print("  No conflicts found.")
+
+    # Demonstrate filtering: show only Biscuit's tasks
+    print("\nFiltering tasks for Biscuit only...")
+    biscuit_tasks = scheduler.filter_tasks(pet_name="Biscuit")
+    print_schedule(biscuit_tasks)
+
+    # Demonstrate filtering: show only incomplete tasks
+    print("\nFiltering incomplete tasks...")
+    incomplete_tasks = scheduler.filter_tasks(completed=False)
+    print_schedule(incomplete_tasks)
 
 
 if __name__ == "__main__":

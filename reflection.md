@@ -18,10 +18,11 @@ detection, and recurring task logic.
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
-
----
+During UI integration, I discovered that free-text time input allowed inconsistent
+formats (e.g. "8:00" vs "08:00"), which caused sorting and conflict detection to
+silently fail since they compared raw strings. I fixed this by normalizing all
+time input through Python's datetime.strptime/strftime before creating a Task,
+ensuring every task's time is stored in a consistent "HH:MM" format.
 
 ## 2. Scheduling Logic and Tradeoffs
 
