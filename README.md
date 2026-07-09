@@ -22,6 +22,15 @@ Your final app should:
 - Display the plan clearly (and ideally explain the reasoning)
 - Include tests for the most important scheduling behaviors
 
+## ✨ Features
+
+- **Pet & task management** — Add multiple pets and assign each their own care tasks (title, duration, priority, time, and frequency)
+- **Chronological scheduling** — `Scheduler.sort_by_time()` orders all tasks across every pet by time of day
+- **Filtering** — `Scheduler.filter_tasks()` lets you view tasks by completion status and/or by pet
+- **Conflict warnings** — `Scheduler.detect_conflicts()` flags any tasks scheduled at the exact same time, so a pet owner never double-books care
+- **Recurring tasks with real dates** — `Scheduler.handle_recurring()` uses Python's `timedelta` to automatically generate the next occurrence of a daily/weekly task, advancing the calendar date correctly
+- **Task completion tracking** — Mark tasks done directly in the UI, which also triggers recurrence logic for repeating tasks
+
 ## Getting started
 
 ### Setup
@@ -46,15 +55,15 @@ pip install -r requirements.txt
 
 ```
 Today's Schedule for Jordan:
-  ⬜ 08:00 — Morning walk (Biscuit, 30 min) [priority: high]
-  ⬜ 08:30 — Feeding (Biscuit, 10 min) [priority: high]
-  ⬜ 14:00 — Vet appointment (Mochi, 45 min) [priority: medium]
+  ⬜ 2026-07-08 08:00 — Morning walk (Biscuit, 30 min) [priority: high]
+  ⬜ 2026-07-08 08:30 — Feeding (Biscuit, 10 min) [priority: high]
+  ⬜ 2026-07-08 14:00 — Vet appointment (Mochi, 45 min) [priority: medium]
 Marking 'Morning walk' complete...
-  ✅ 08:00 — Morning walk (Biscuit, 30 min) [priority: high]
-  ⬜ 08:30 — Feeding (Biscuit, 10 min) [priority: high]
-  ⬜ 14:00 — Vet appointment (Mochi, 45 min) [priority: medium]
+  ✅ 2026-07-08 08:00 — Morning walk (Biscuit, 30 min) [priority: high]
+  ⬜ 2026-07-08 08:30 — Feeding (Biscuit, 10 min) [priority: high]
+  ⬜ 2026-07-08 14:00 — Vet appointment (Mochi, 45 min) [priority: medium]
 Handling recurrence for 'Morning walk'...
-  New task created for tomorrow: Morning walk at 08:00
+  New task created for 2026-07-09: Morning walk at 08:00
 Checking for scheduling conflicts...
   No conflicts found.
 ```
@@ -69,7 +78,7 @@ python -m pytest
 My test suite covers:
 - Basic task/pet behavior (marking complete, adding tasks)
 - Sorting correctness (chronological order, empty-list edge case)
-- Recurrence logic (daily tasks generate a new occurrence; one-time and incomplete tasks do not)
+- Recurrence logic (daily tasks generate a new occurrence with the correct due_date advanced by timedelta; one-time and incomplete tasks do not)
 - Conflict detection (duplicate times are flagged; completed tasks are correctly excluded from conflicts; no false positives on distinct times)
 
 Sample test output:
@@ -83,11 +92,10 @@ collected 10 items
 
 tests\test_pawpal.py ..........                                                                                    [100%]
 
-=================================================== 10 passed in 0.09s ===================================================
+=================================================== 10 passed in 0.08s ===================================================
 ```
 
 **Confidence Level:** ⭐⭐⭐⭐☆ (4/5) — All core behaviors and several edge cases are verified. I'd want to test multi-day recurrence chains and larger datasets before rating this 5/5.
-```
 
 ## 📐 Smarter Scheduling
 
@@ -96,16 +104,32 @@ tests\test_pawpal.py ..........                                                 
 | Task sorting | `Scheduler.sort_by_time()` | Sorts all tasks chronologically by their "HH:MM" time string |
 | Filtering | `Scheduler.filter_tasks()` | Filters by completion status and/or pet name |
 | Conflict handling | `Scheduler.detect_conflicts()` | Flags tasks scheduled at the same time; only considers incomplete tasks |
-| Recurring tasks | `Scheduler.handle_recurring()` | Creates a fresh incomplete Task instance for daily/weekly tasks once marked complete |
+| Recurring tasks | `Scheduler.handle_recurring()` | Uses `timedelta` to create a new Task instance with `due_date` advanced by 1 day (daily) or 7 days (weekly) once the original is marked complete |
 
 ## 📸 Demo Walkthrough
 
-Describe your app in numbered steps so a reader can follow along without watching a video:
+1. **Add a pet** — Enter a pet's name and species (dog/cat/other), then click "Add pet." The pet is stored in the app's session so it persists as you keep interacting.
+2. **Add tasks** — Select which pet the task belongs to, then fill in the task title, duration, priority, time, and frequency (once/daily/weekly), and click "Add task."
+3. **Mark tasks complete** — In the "Manage Tasks" section, every task shows its status and a "Mark done" button. Clicking it calls `Task.mark_complete()` and immediately updates the checkmark.
+4. **Generate a schedule** — Optionally filter by pet or completion status, then click "Generate schedule" to see a sorted table of tasks for the day.
+5. **Conflict warnings** — If two tasks land on the same time slot, the app displays a warning (e.g. "Conflict at 08:00: Morning walk (Biscuit), Feeding (Mochi)") instead of silently allowing a double-booking.
+6. **Recurring tasks** — Marking a daily/weekly task complete automatically creates its next occurrence with the correct future date, which then appears in the next generated schedule.
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+### Sample CLI output (from `main.py`)
+
+```
+Today's Schedule for Jordan:
+  ⬜ 2026-07-08 08:00 — Morning walk (Biscuit, 30 min) [priority: high]
+  ⬜ 2026-07-08 08:30 — Feeding (Biscuit, 10 min) [priority: high]
+  ⬜ 2026-07-08 14:00 — Vet appointment (Mochi, 45 min) [priority: medium]
+Marking 'Morning walk' complete...
+  ✅ 2026-07-08 08:00 — Morning walk (Biscuit, 30 min) [priority: high]
+  ⬜ 2026-07-08 08:30 — Feeding (Biscuit, 10 min) [priority: high]
+  ⬜ 2026-07-08 14:00 — Vet appointment (Mochi, 45 min) [priority: medium]
+Handling recurrence for 'Morning walk'...
+  New task created for 2026-07-09: Morning walk at 08:00
+Checking for scheduling conflicts...
+  No conflicts found.
+```
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
