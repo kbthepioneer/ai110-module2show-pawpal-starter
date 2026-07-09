@@ -89,6 +89,7 @@ else:
 
 st.divider()
 
+
 # --- Build and display schedule ---
 st.subheader("Build Schedule")
 
