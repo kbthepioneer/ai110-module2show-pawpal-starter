@@ -92,12 +92,28 @@ st.divider()
 # --- Build and display schedule ---
 st.subheader("Build Schedule")
 
+col1, col2 = st.columns(2)
+with col1:
+    filter_pet = st.selectbox("Filter by pet", ["All"] + [pet.name for pet in owner.pets]) if owner.pets else "All"
+with col2:
+    filter_status = st.selectbox("Filter by status", ["All", "Completed", "Incomplete"])
+
 if st.button("Generate schedule"):
     scheduler = Scheduler(owner)
     sorted_tasks = scheduler.sort_by_time()
 
+    # Apply pet filter
+    if filter_pet != "All":
+        sorted_tasks = [t for t in sorted_tasks if t.pet_name == filter_pet]
+
+    # Apply status filter
+    if filter_status == "Completed":
+        sorted_tasks = [t for t in sorted_tasks if t.completed]
+    elif filter_status == "Incomplete":
+        sorted_tasks = [t for t in sorted_tasks if not t.completed]
+
     if not sorted_tasks:
-        st.info("No tasks yet. Add a pet and some tasks first.")
+        st.info("No tasks match these filters. Add a pet/task or adjust your filters.")
     else:
         st.write("### Today's Schedule")
         table_data = [
@@ -113,7 +129,7 @@ if st.button("Generate schedule"):
         ]
         st.table(table_data)
 
-        # Show any scheduling conflicts
+        # Show any scheduling conflicts (checked against the full unfiltered schedule)
         conflicts = scheduler.detect_conflicts()
         if conflicts:
             for warning in conflicts:

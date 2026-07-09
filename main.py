@@ -8,7 +8,7 @@ def print_schedule(tasks):
         return
     for task in tasks:
         status = "✅" if task.completed else "⬜"
-        print(f"  {status} {task.time} — {task.title} ({task.pet_name}, {task.duration_minutes} min) [priority: {task.priority}]")
+        print(f"  {status} {task.due_date} {task.time} — {task.title} ({task.pet_name}, {task.duration_minutes} min) [priority: {task.priority}]")
 
 
 def main():
@@ -44,7 +44,7 @@ def main():
     print("\nHandling recurrence for 'Morning walk'...")
     next_occurrence = scheduler.handle_recurring(sorted_tasks[0])
     if next_occurrence:
-        print(f"  New task created for next occurrence: {next_occurrence.title} at {next_occurrence.time} (frequency: {next_occurrence.frequency}, completed: {next_occurrence.completed})")
+        print(f"  New task created for {next_occurrence.due_date}: {next_occurrence.title} at {next_occurrence.time}")
 
     # Demonstrate conflict detection
     print("\nChecking for scheduling conflicts...")

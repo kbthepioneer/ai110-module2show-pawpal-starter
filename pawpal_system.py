@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 
 
 @dataclass
@@ -13,6 +13,7 @@ class Task:
     frequency: str = "once"  # "once", "daily", "weekly"
     completed: bool = False
     pet_name: str = ""  # set automatically when added to a Pet
+    due_date: date = field(default_factory=date.today)  # the calendar date this task occurs on
 
     def mark_complete(self) -> None:
         """Marks this task as completed."""
@@ -99,15 +100,15 @@ class Scheduler:
         return warnings
 
     def handle_recurring(self, task: Task) -> Optional[Task]:
-        """If a completed task is daily/weekly, creates and returns the next occurrence."""
+        """If a completed task is daily/weekly, creates and returns the next occurrence,
+        with its due_date calculated using timedelta."""
         if not task.completed or task.frequency == "once":
             return None
 
-        # Calculate the next date offset based on frequency
+        # Calculate how many days ahead the next occurrence falls
         days_ahead = 1 if task.frequency == "daily" else 7
+        next_due_date = task.due_date + timedelta(days=days_ahead)
 
-        # NOTE: since we only track time (not full datetime), we just create
-        # a fresh Task instance for the next occurrence with completed reset.
         next_task = Task(
             title=task.title,
             duration_minutes=task.duration_minutes,
@@ -116,6 +117,7 @@ class Scheduler:
             frequency=task.frequency,
             completed=False,
             pet_name=task.pet_name,
+            due_date=next_due_date,
         )
 
         # Find the pet this task belongs to and add the new occurrence

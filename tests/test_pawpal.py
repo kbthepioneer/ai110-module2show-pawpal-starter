@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import timedelta
 
 # Allow tests to import pawpal_system.py from the project root
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -71,11 +72,13 @@ def test_sort_by_time_with_no_tasks_returns_empty_list():
 # --- Recurrence logic ---
 
 def test_recurrence_creates_new_task_for_daily_frequency():
-    """Confirm that marking a daily task complete creates a new task for the next occurrence."""
+    """Confirm that marking a daily task complete creates a new task for the next occurrence,
+    with its due_date correctly advanced by one day."""
     owner = make_owner_with_tasks()
     scheduler = Scheduler(owner)
 
     walk_task = next(t for t in owner.get_all_tasks() if t.title == "Morning walk")
+    original_due_date = walk_task.due_date
     walk_task.mark_complete()
 
     tasks_before = len(owner.get_all_tasks())
@@ -85,6 +88,7 @@ def test_recurrence_creates_new_task_for_daily_frequency():
     assert next_task is not None
     assert next_task.completed is False
     assert next_task.frequency == "daily"
+    assert next_task.due_date == original_due_date + timedelta(days=1)
     assert tasks_after == tasks_before + 1
 
 
