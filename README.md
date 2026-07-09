@@ -69,6 +69,20 @@ Checking for scheduling conflicts...
   No conflicts found.
 ```
 
+## 🎯 Priority-Based Scheduling (Challenge 3)
+
+`Scheduler.sort_by_priority()` sorts tasks by priority (high → medium → low) first, then by time within each priority level:
+
+```
+Sorting by priority (high > medium > low), then time...
+  ✅ 2026-07-08 08:00 — Morning walk (Biscuit, 30 min) [priority: high]
+  ⬜ 2026-07-09 08:00 — Morning walk (Biscuit, 30 min) [priority: high]
+  ⬜ 2026-07-08 08:30 — Feeding (Biscuit, 10 min) [priority: high]
+  ⬜ 2026-07-08 14:00 — Vet appointment (Mochi, 45 min) [priority: medium]
+```
+
+Note how the medium-priority Vet appointment (14:00) is pushed to the bottom even though it's chronologically the latest task — priority overrides pure time-based ordering.
+
 ## 🧪 Testing PawPal+
 
 ```bash
