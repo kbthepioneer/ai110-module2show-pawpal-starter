@@ -28,15 +28,20 @@ ensuring every task's time is stored in a consistent "HH:MM" format.
 
 **a. Constraints and priorities**
 
-- What constraints does your scheduler consider (for example: time, priority, preferences)?
-- How did you decide which constraints mattered most?
+My scheduler considers time (to sort and detect conflicts) and priority (low/medium/high,
+displayed alongside each task). I prioritized time-based conflict detection first since
+double-booking a pet's care is the most concrete, checkable failure mode; priority is
+currently informational rather than used to reorder tasks, since the base requirements
+only asked for time-based sorting.
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
-
----
+My scheduler only tracks time-of-day (HH:MM), not a full date, so recurring tasks
+work by creating a fresh, incomplete Task instance with the same time rather than
+computing an actual future calendar date. This is a reasonable tradeoff for a
+single-day planning tool like PawPal+, since the owner primarily cares about
+"what happens today" rather than tracking a multi-day calendar. A future version
+could add a real date field if longer-term planning became a requirement.
 
 ## 3. AI Collaboration
 
