@@ -65,6 +65,11 @@ def main():
     incomplete_tasks = scheduler.filter_tasks(completed=False)
     print_schedule(incomplete_tasks)
 
+    # Challenge 3: Priority-based scheduling
+    print("\nSorting by priority (high > medium > low), then time...")
+    priority_sorted = scheduler.sort_by_priority()
+    print_schedule(priority_sorted)
+
 
 if __name__ == "__main__":
     main()

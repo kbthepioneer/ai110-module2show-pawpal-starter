@@ -26,6 +26,7 @@ Your final app should:
 
 - **Pet & task management** — Add multiple pets and assign each their own care tasks (title, duration, priority, time, and frequency)
 - **Chronological scheduling** — `Scheduler.sort_by_time()` orders all tasks across every pet by time of day
+- **Priority-based scheduling** — `Scheduler.sort_by_priority()` orders tasks by priority (high → medium → low) first, then by time within each priority level
 - **Filtering** — `Scheduler.filter_tasks()` lets you view tasks by completion status and/or by pet
 - **Conflict warnings** — `Scheduler.detect_conflicts()` flags any tasks scheduled at the exact same time, so a pet owner never double-books care
 - **Recurring tasks with real dates** — `Scheduler.handle_recurring()` uses Python's `timedelta` to automatically generate the next occurrence of a daily/weekly task, advancing the calendar date correctly
@@ -102,6 +103,7 @@ tests\test_pawpal.py ..........                                                 
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
 | Task sorting | `Scheduler.sort_by_time()` | Sorts all tasks chronologically by their "HH:MM" time string |
+| Priority scheduling | `Scheduler.sort_by_priority()` | Sorts tasks by priority (high → medium → low) first, then by time within each priority level |
 | Filtering | `Scheduler.filter_tasks()` | Filters by completion status and/or pet name |
 | Conflict handling | `Scheduler.detect_conflicts()` | Flags tasks scheduled at the same time; only considers incomplete tasks |
 | Recurring tasks | `Scheduler.handle_recurring()` | Uses `timedelta` to create a new Task instance with `due_date` advanced by 1 day (daily) or 7 days (weekly) once the original is marked complete |
